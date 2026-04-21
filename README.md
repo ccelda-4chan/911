@@ -1,14 +1,16 @@
-# SOLID BOMBER PRO
+# SOLID BOMBER PRO - PRESTIGE EDITION
 
-Professional SMS & Call Bombing Engine with a modern Web Interface.
+Professional SMS & Call Bombing Engine with a modern, high-performance Web Interface.
 
 ## 🚀 Improvements & Features
 - **Modern Architecture**: Modular design with separate Engine, Services, and UI layers.
-- **Robust Networking**: Persistent `aiohttp` session management and connection pooling.
-- **Observability**: Structured logging and real-time WebUI status polling.
+- **Prestige UI/UX**: Stunning Philippine-themed dashboard with "uiverse.io" style animations.
+- **Enhanced Power**: Optimized async engine with increased concurrency and reduced delays.
+- **Multi-Target Support**: Deploy payloads to multiple phone numbers simultaneously.
+- **Real-Time Visuals**: Dynamic rocket explosion animations on successful hits.
+- **High Volume**: Standardized 100-batch default intensity for maximum impact.
 - **Performance**: Asynchronous execution with global concurrency limits (Semaphores).
-- **Security**: Environment-based configuration and session-protected WebUI.
-- **UX/UI**: Sleek Dashboard built with Bootstrap 5 and real-time logs.
+- **Observability**: Structured logging and real-time WebUI status polling.
 
 ## 🛠 Deployment
 - **Render.com**: Fully compatible via `render.yaml`.
