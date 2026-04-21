@@ -323,13 +323,21 @@
                         <input type="text" class="form-control" id="flood-url" placeholder="https://target-site.com">
                     </div>
                     <div class="row mb-4">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label">Method</label>
+                            <select class="form-select" id="flood-method">
+                                <option value="GET" selected>GET (Standard)</option>
+                                <option value="POST">POST (Payload)</option>
+                                <option value="HEAD">HEAD (Stealth)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Duration (Seconds)</label>
                             <input type="number" class="form-control" id="flood-duration" value="60">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Concurrency (Workers)</label>
-                            <input type="number" class="form-control" id="flood-concurrency" value="30">
+                        <div class="col-md-4">
+                            <label class="form-label">Intensity (Workers)</label>
+                            <input type="number" class="form-control" id="flood-concurrency" value="100">
                         </div>
                     </div>
                     <div class="mb-4">
@@ -338,12 +346,12 @@
                                 <span class="uptime-meter" id="uptime-dot"></span>
                                 <span id="uptime-text" class="text-muted">Target Status: WAITING</span>
                             </div>
-                            <div class="text-accent" id="flood-packet-count">0 PPS</div>
+                            <div class="text-accent" id="flood-packet-count">0 PACKETS</div>
                         </div>
                     </div>
                     <div class="d-grid">
                         <button class="btn-dispatch" id="btn-flood-start" onclick="startFlood()">
-                            <i class="bi bi-lightning-charge-fill"></i> EXECUTE STRESS ANALYSIS
+                            <i class="bi bi-lightning-charge-fill"></i> EXECUTE POWER-FLOOD
                         </button>
                     </div>
                 </div>
@@ -531,13 +539,14 @@
             const url = document.getElementById('flood-url').value;
             const duration = document.getElementById('flood-duration').value;
             const concurrency = document.getElementById('flood-concurrency').value;
+            const method = document.getElementById('flood-method').value;
 
-            addLog("EXECUTING NETWORK STRESS ANALYSIS...", "warn");
+            addLog(`EXECUTING POWER-FLOOD [${method}]...`, "warn");
             
             const res = await fetch('/analyze/stress', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, duration, concurrency })
+                body: JSON.stringify({ url, duration, concurrency, method })
             });
             const data = await res.json();
             if (data.success) {
@@ -585,12 +594,12 @@
             const body = document.getElementById('tracker-logs-body');
             if (!clicks || clicks.length === 0) return;
             body.innerHTML = '';
-            clicks.reverse().forEach(c => {
+            clicks.forEach(c => {
                 const row = `<tr>
-                    <td>${c.timestamp.split('T')[1].split('.')[0]}</td>
-                    <td>${c.ip}</td>
-                    <td>${c.geo.city || 'Capturing...'}</td>
-                    <td>${c.user_agent.substring(0, 30)}...</td>
+                    <td>${c.timestamp}</td>
+                    <td style="color: var(--accent); font-weight: bold;">${c.ip}</td>
+                    <td>${c.location}</td>
+                    <td style="font-size: 0.65rem; color: #777;">${c.isp_ua}</td>
                 </tr>`;
                 body.innerHTML += row;
             });
