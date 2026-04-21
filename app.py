@@ -25,44 +25,30 @@ attack_state = {
     "lock": threading.Lock()
 }
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        if request.form.get('password') == config.APP_PASSWORD:
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-        error = 'Invalid Password'
-    return render_template('login.html', error=error)
-
-@app.route('/logout')
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('login'))
-
 @app.route('/')
-@login_required
 def dashboard():
     return render_template('dashboard.html', services=services)
 
 @app.route('/attack', methods=['POST'])
-@login_required
 def start_attack():
     data = request.json
-    phone = data.get('phone', '')
-    amount = int(data.get('amount', 5))
+    phone_raw = data.get('phone', '')
+    amount = int(data.get('amount', 100))
     selected_services = data.get('services')
 
-    if not re.match(r'^(09\d{9}|9\d{9}|\+639\d{9})$', phone.replace(' ', '')):
-        return jsonify({"success": False, "error": "Invalid phone format"}), 400
+    # Parse multiple phone numbers
+    phones = [p.strip() for p in re.split(r'[,\n\r\s]+', phone_raw) if p.strip()]
+    
+    if not phones:
+        return jsonify({"success": False, "error": "No valid phone numbers provided"}), 400
+
+    valid_phones = []
+    for phone in phones:
+        if re.match(r'^(09\d{9}|9\d{9}|\+639\d{9})$', phone.replace(' ', '')):
+            valid_phones.append(phone)
+    
+    if not valid_phones:
+        return jsonify({"success": False, "error": "Invalid phone format(s)"}), 400
 
     with attack_state["lock"]:
         if attack_state["active"]:
@@ -83,13 +69,13 @@ def start_attack():
                 attack_state["success"] += success
                 attack_state["failed"] += failed
                 attack_state["logs"].append({
-                    "msg": f"Batch {batch}/{total} completed: {success} OK, {failed} FAIL",
+                    "msg": f"Batch {batch}/{total}: {success} OK, {failed} FAIL",
                     "type": "info"
                 })
 
         try:
             loop.run_until_complete(engine.run_attack(
-                phone, amount, selected_services, on_progress=progress_callback
+                valid_phones, amount, selected_services, on_progress=progress_callback
             ))
         except Exception as e:
             logger.exception("Background attack failed")
@@ -99,7 +85,7 @@ def start_attack():
             with attack_state["lock"]:
                 attack_state["active"] = False
             loop.close()
-            gc.collect() # Aggressive cleanup for low RAM
+            gc.collect()
 
     thread = threading.Thread(target=run_in_bg)
     thread.start()
@@ -107,7 +93,6 @@ def start_attack():
     return jsonify({"success": True})
 
 @app.route('/status')
-@login_required
 def get_status():
     with attack_state["lock"]:
         logs = attack_state["logs"]
