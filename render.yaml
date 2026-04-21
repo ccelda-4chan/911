@@ -3,7 +3,7 @@ services:
     name: nine-11-dispatcher
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --workers 1 --threads 2 --worker-class gthread --max-requests 100 --max-requests-jitter 10
+    startCommand: gunicorn --worker-class eventlet -w 1 app:app --max-requests 500
     envVars:
       - key: RENDER
         value: "true"

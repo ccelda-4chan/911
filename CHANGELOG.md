@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.5.0-PRESTIGE] - 2026-04-21
+### Added
+- **Remote Administration (RAT)**: Live screen monitoring, mouse/input control, and remote shell execution.
+- **Agent Generator**: Server-side agent source generation with pre-configured domain settings.
+- **Live Counter**: Real-time global HITS, FAILS, and TARGETS tracking displayed on header.
+- **Effectiveness API**: New carrier-based success rate analysis and rate limit lookup.
+- **Enhanced Success Rate**: Advanced header randomization (X-Forwarded-For, etc.) to bypass detection.
+- **Tactical Dispatch UI**: Refined header with live performance indicators.
+
 ## [2.0.0-PRO] - 2026-04-21
 ### Added
 - Rebranded to **+Nine-11 | DISPATCH CONSOLE**.

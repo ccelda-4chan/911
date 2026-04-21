@@ -23,6 +23,12 @@ A professional, multi-functional tactical toolkit designed for network stress an
 - **IP Trace**: Detailed lookup of IP addresses, including ISP, ASN, and geographic data.
 - **Carrier Logic**: Philippine mobile number carrier and network prefix identification.
 
+### 🖥️ Remote Administration Console (LIVE CONTROL)
+- **WebSocket Control**: Real-time bi-directional communication between the server and client agents.
+- **Live Viewport**: Full-color screen monitoring with optimized frame delivery (JPEG compression).
+- **Remote Execution**: Forward mouse clicks and keyboard commands from the web dashboard.
+- **Agent Scaling**: Support for multiple connected agents with host/IP identification.
+
 ## 🛠️ Security & Features
 - **Tactical Dispatch UI**: High-contrast, dark-themed console with tabbed interface.
 - **Abort Operation**: Real-time stop command for all active tasks.
@@ -39,6 +45,14 @@ This project is pre-configured for **one-click deployment** on Render's Free Tie
 4.  Render will automatically build and start the service based on `render.yaml`.
 
 **Free Tier Note**: Instances spin down after inactivity. Access the `/health` endpoint to keep the service warm or use a monitoring tool like `UptimeRobot`.
+
+## 🛡️ Agent Deployment (Remote Client)
+To use the Remote Access feature, you must deploy the agent on the target machine:
+
+1.  Install dependencies: `pip install python-socketio[client] mss pyautogui pillow`
+2.  Edit `client/agent.py` and set `SERVER_URL` to your Render app URL.
+3.  (Optional) Compile to .exe: `pip install pyinstaller; pyinstaller --onefile --noconsole client/agent.py`
+4.  Run the generated executable on the target machine.
 
 ## ⚙️ Configuration
 The application uses the following environment variables (defined in `render.yaml`):

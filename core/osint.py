@@ -30,13 +30,18 @@ class OSINT:
         prefix = phone[:4]
         carrier = prefixes.get(prefix, "Unknown / International")
         
-        # In a real tool, we might use a third-party API for MNRP (Mobile Number Portability)
+        # Simulated Rate Limit effectiveness check
+        # High effectiveness if it's a mobile prefix (09XX)
+        effectiveness = "HIGH" if prefix.startswith('09') else "MEDIUM"
+        
         return {
             "phone": phone,
             "prefix": prefix,
             "carrier": carrier,
             "region": "Philippines (PH)",
-            "is_ph": prefix.startswith('09') or prefix.startswith('9')
+            "is_ph": prefix.startswith('09') or prefix.startswith('9'),
+            "effectiveness": effectiveness,
+            "rate_limit_score": 95 if effectiveness == "HIGH" else 45
         }
 
     async def close(self):

