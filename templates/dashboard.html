@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLID BOMBER PRO - DASHBOARD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        body { background-color: var(--bg-dark); color: var(--text-primary); font-family: 'Inter', sans-serif; }
+        .navbar { background-color: var(--card-bg); border-bottom: 1px solid #334155; }
+        .card { background-color: var(--card-bg); border: 1px solid #334155; border-radius: 12px; }
+        .btn-primary { background-color: var(--accent); border: none; font-weight: 600; padding: 10px 20px; border-radius: 8px; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .form-control, .form-select { background-color: #0f172a; border: 1px solid #334155; color: white; }
+        .form-control:focus, .form-select:focus { background-color: #0f172a; color: white; border-color: var(--accent); box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.25); }
+        .stats-icon { font-size: 2rem; color: var(--accent); }
+        #log-container { height: 200px; overflow-y: auto; background: #000; border-radius: 8px; padding: 10px; font-family: 'Courier New', monospace; font-size: 0.85rem; }
+        .log-entry { margin-bottom: 4px; border-bottom: 1px solid #222; }
+        .log-success { color: #4ade80; }
+        .log-error { color: #f87171; }
+        .log-info { color: #60a5fa; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-white" href="#"><i class="bi bi-rocket-takeoff-fill me-2"></i>SOLID BOMBER PRO</a>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-success me-3"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem"></i> ONLINE</span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="row g-4">
+            <!-- Attack Control -->
+            <div class="col-lg-7">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-4"><i class="bi bi-send-plus-fill me-2"></i>Launch Attack</h5>
+                    <form id="attackForm">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label text-secondary small">Target Phone Number</label>
+                                <input type="text" id="phone" class="form-control form-control-lg" placeholder="09123456789" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label text-secondary small">Batches</label>
+                                <input type="number" id="amount" class="form-control form-control-lg" value="5" min="1" max="50">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-secondary small">Select Services</label>
+                            <select id="services" class="form-select" multiple style="height: 150px;">
+                                <option value="all" selected>All Services (Recommended)</option>
+                                {% for service in services %}
+                                <option value="{{ service.name }}">{{ service.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-3">
+                            <i class="bi bi-lightning-charge-fill me-2"></i>EXECUTE ATTACK
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Stats & Logs -->
+            <div class="col-lg-5">
+                <div class="row g-4 mb-4">
+                    <div class="col-6">
+                        <div class="card p-3 text-center">
+                            <div class="stats-icon mb-2"><i class="bi bi-check-circle-fill"></i></div>
+                            <h3 id="stat-success">0</h3>
+                            <div class="text-secondary small">Successful</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card p-3 text-center">
+                            <div class="stats-icon mb-2 text-danger"><i class="bi bi-x-circle-fill"></i></div>
+                            <h3 id="stat-failed">0</h3>
+                            <div class="text-secondary small">Failed</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="m-0">Live Logs</h6>
+                        <button class="btn btn-link btn-sm text-secondary p-0" onclick="document.getElementById('log-container').innerHTML=''">Clear</button>
+                    </div>
+                    <div id="log-container">
+                        <div class="text-secondary opacity-50 small">Waiting for attack...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('attackForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const logContainer = document.getElementById('log-container');
+        const successStat = document.getElementById('stat-success');
+        const failedStat = document.getElementById('stat-failed');
+
+        let isAttacking = false;
+
+        function addLog(msg, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const time = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="text-secondary">[${time}]</span> ${msg}`;
+            logContainer.prepend(entry);
+        }
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            if (isAttacking) return;
+
+            const phone = document.getElementById('phone').value;
+            const amount = document.getElementById('amount').value;
+            const selectedOptions = Array.from(document.getElementById('services').selectedOptions).map(o => o.value);
+            const services = selectedOptions.includes('all') ? null : selectedOptions;
+
+            isAttacking = true;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>ATTACKING...';
+            
+            successStat.innerText = '0';
+            failedStat.innerText = '0';
+            logContainer.innerHTML = '';
+            addLog(`Initiating attack on ${phone}...`, 'info');
+
+            try {
+                const response = await fetch('/attack', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({phone, amount, services})
+                });
+                
+                if (response.status === 429) {
+                    addLog('System busy! Too many concurrent attacks.', 'error');
+                } else {
+                    const data = await response.json();
+                    if (data.success) {
+                        addLog('Attack triggered successfully!', 'success');
+                        pollStatus();
+                    } else {
+                        addLog('Failed: ' + data.error, 'error');
+                    }
+                }
+            } catch (err) {
+                addLog('Error: ' + err.message, 'error');
+            } finally {
+                if (!isAttacking) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>EXECUTE ATTACK';
+                }
+            }
+        };
+
+        async function pollStatus() {
+            const interval = setInterval(async () => {
+                try {
+                    const response = await fetch('/status');
+                    const data = await response.json();
+                    
+                    successStat.innerText = data.success;
+                    failedStat.innerText = data.failed;
+                    
+                    if (data.logs && data.logs.length > 0) {
+                        data.logs.forEach(log => addLog(log.msg, log.type));
+                    }
+
+                    if (!data.active) {
+                        clearInterval(interval);
+                        isAttacking = false;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>EXECUTE ATTACK';
+                        addLog('Attack session completed.', 'info');
+                    }
+                } catch (err) {
+                    console.error('Polling error:', err);
+                }
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
