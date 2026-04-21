@@ -9,6 +9,8 @@ from services.bomber_services import get_default_services
 import re
 import os
 
+import gc
+
 app = Flask(__name__)
 app.secret_key = config.SESSION_SECRET
 
@@ -97,6 +99,7 @@ def start_attack():
             with attack_state["lock"]:
                 attack_state["active"] = False
             loop.close()
+            gc.collect() # Aggressive cleanup for low RAM
 
     thread = threading.Thread(target=run_in_bg)
     thread.start()

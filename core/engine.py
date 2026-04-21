@@ -9,13 +9,18 @@ class Engine:
     def __init__(self, services: List[BaseService]):
         self.services = services
         self._session: Optional[aiohttp.ClientSession] = None
-        self._semaphore = asyncio.Semaphore(50) # Limit total concurrent service calls
+        self._semaphore = asyncio.Semaphore(15) # Reduced for 0.1 CPU limit
 
     async def get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
             self._session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=30),
-                connector=aiohttp.TCPConnector(limit=100, ssl=False) # ssl=False to handle potential cert issues seen in stress tests
+                timeout=aiohttp.ClientTimeout(total=20), # Shorter timeout
+                connector=aiohttp.TCPConnector(
+                    limit=25, # Reduced for low RAM
+                    ttl_dns_cache=300,
+                    use_dns_cache=True,
+                    ssl=False
+                )
             )
         return self._session
 
