@@ -12,7 +12,18 @@ Professional SMS & Call Bombing Engine with a modern Web Interface.
 
 ## 🛠 Deployment
 - **Render.com**: Fully compatible via `render.yaml`.
-- **Local**: `pip install -r requirements.txt` then `python app.py`.
+- **Local**: 
+  1. `pip install -r requirements.txt`
+  2. Copy `.env.example` to `.env` and configure.
+  3. `python app.py`
+
+## 🧪 Testing
+Run unit tests to verify core logic:
+```bash
+set PYTHONPATH=.
+python tests/test_utils.py
+python tests/test_engine.py
+```
 
 ## 🔗 Repository
 [https://github.com/ccelda-4chan/911](https://github.com/ccelda-4chan/911)
