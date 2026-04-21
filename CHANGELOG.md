@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0-PRO] - 2026-04-21
+### Added
+- Rebranded to **+Nine-11 | DISPATCH CONSOLE**.
+- **Network Stress Analysis (L7 Flood)**: High-concurrency Layer 7 HTTP flood tool with target uptime monitoring.
+- **Location Verification (IP Tracker)**: Advanced link generator for tracking visitor IP, geo-location, and device info.
+- **Intelligence Inquiry (OSINT)**: Unified IP and Phone carrier lookup database.
+- **Abort Operation**: Real-time stop mechanism for all active engines.
+- **Dispatch UI**: High-end tactical console with tabbed interface, terminal logs, and live visualizations.
+- **Multi-Node Support**: Parallel signal dispatch for multiple target numbers.
+
 ## [1.2.0] - 2026-04-21
 ### Added
 - Modular architecture with `core`, `services`, and `utils` packages.

@@ -10,6 +10,10 @@ class Engine:
         self.services = services
         self._session: Optional[aiohttp.ClientSession] = None
         self._semaphore = asyncio.Semaphore(30) # Increased for "more powerful" engine
+        self._abort = False
+
+    def stop(self):
+        self._abort = True
 
     async def get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
@@ -47,8 +51,13 @@ class Engine:
 
         total_success = 0
         total_failed = 0
+        self._abort = False
 
         for i in range(1, batches + 1):
+            if self._abort:
+                logger.info("Attack aborted by user")
+                break
+            
             logger.info(f"Starting batch {i}/{batches} for {len(phones)} targets")
             
             tasks = []
