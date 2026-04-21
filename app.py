@@ -119,6 +119,14 @@ def get_status():
             "logs": logs
         })
 
+@app.route('/health')
+def health_check():
+    return jsonify({
+        "status": "healthy",
+        "services_loaded": len(services),
+        "engine_active": engine._session is not None and not engine._session.closed
+    })
+
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
