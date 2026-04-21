@@ -11,159 +11,213 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #050a14;
-            --card-bg: rgba(16, 24, 48, 0.8);
+            --bg-dark: #020617;
+            --card-bg: rgba(15, 23, 42, 0.95);
             --ph-blue: #0038A8;
             --ph-red: #CE1126;
             --ph-yellow: #FCD116;
             --ph-white: #FFFFFF;
             --accent: var(--ph-yellow);
             --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
+            --text-secondary: #cbd5e1;
+            --success: #22c55e;
+            --danger: #ef4444;
         }
 
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 20% 30%, rgba(0, 56, 168, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(206, 17, 38, 0.15) 0%, transparent 50%);
+                radial-gradient(circle at 10% 20%, rgba(0, 56, 168, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(206, 17, 38, 0.2) 0%, transparent 40%);
             color: var(--text-primary);
             font-family: 'Rajdhani', sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            font-size: 1.1rem;
         }
 
         h1, h2, h3, h4, h5, .navbar-brand {
             font-family: 'Orbitron', sans-serif;
             letter-spacing: 2px;
+            font-weight: 700;
         }
 
         .navbar {
-            background: rgba(5, 10, 20, 0.95);
+            background: rgba(2, 6, 23, 0.98);
             backdrop-filter: blur(10px);
             border-bottom: 2px solid var(--ph-blue);
-            box-shadow: 0 4px 20px rgba(0, 56, 168, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 56, 168, 0.4);
+            padding: 1rem 0;
         }
 
         .navbar-brand img {
-            width: 40px;
-            height: 40px;
-            filter: drop-shadow(0 0 5px var(--ph-yellow));
-            margin-right: 10px;
+            width: 45px;
+            height: 45px;
+            filter: drop-shadow(0 0 8px var(--ph-yellow));
+            margin-right: 15px;
         }
 
         .card {
             background: var(--card-bg);
-            border: 1px solid rgba(148, 163, 184, 0.1);
-            border-radius: 16px;
-            backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(148, 163, 184, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         }
 
         .card:hover {
             border-color: var(--ph-blue);
-            box-shadow: 0 8px 32px rgba(0, 56, 168, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 56, 168, 0.25);
         }
 
         .stats-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+            background: linear-gradient(135deg, #1e293b, #0f172a);
             position: relative;
-            overflow: hidden;
+            z-index: 1;
         }
 
-        .stats-card::after {
-            content: '';
+        .stats-card::before {
+            content: "";
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, var(--ph-blue), transparent 30%);
-            animation: rotate 4s linear infinite;
-            z-index: -1;
-            opacity: 0.1;
-        }
-
-        @keyframes rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(45deg, var(--ph-blue), var(--ph-red));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.5;
         }
 
         .btn-primary {
-            background: linear-gradient(45deg, var(--ph-blue), #0056e6);
+            background: linear-gradient(90deg, var(--ph-blue), #0056e6, var(--ph-blue));
+            background-size: 200% auto;
             border: none;
+            font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 12px 24px;
-            border-radius: 10px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 56, 168, 0.4);
+            letter-spacing: 2px;
+            padding: 16px 32px;
+            border-radius: 12px;
+            transition: 0.5s;
+            box-shadow: 0 4px 20px rgba(0, 56, 168, 0.5);
         }
 
         .btn-primary:hover {
-            background: linear-gradient(45deg, #0056e6, var(--ph-blue));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 56, 168, 0.6);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        /* UIverse inspired button effect */
-        .btn-primary::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .btn-primary:hover::before {
-            left: 100%;
+            background-position: right center;
+            box-shadow: 0 8px 25px rgba(0, 56, 168, 0.7);
+            transform: scale(1.02);
         }
 
         .form-control, .form-select {
-            background-color: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.2);
+            background-color: rgba(2, 6, 23, 0.8);
+            border: 2px solid rgba(148, 163, 184, 0.2);
             color: white;
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
         }
 
-        .form-control:focus, .form-select:focus {
-            background-color: rgba(15, 23, 42, 0.9);
-            color: white;
-            border-color: var(--ph-blue);
-            box-shadow: 0 0 0 0.25rem rgba(0, 56, 168, 0.25);
-        }
-
-        .stats-icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(to bottom, var(--ph-white), var(--ph-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .form-control:focus {
+            background-color: #000;
+            border-color: var(--ph-yellow);
+            box-shadow: 0 0 15px rgba(252, 209, 22, 0.2);
         }
 
         #log-container {
-            height: 250px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 12px;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            border: 1px solid rgba(0, 56, 168, 0.3);
-            scrollbar-width: thin;
-            scrollbar-color: var(--ph-blue) transparent;
+            height: 300px;
+            font-size: 1rem;
+            line-height: 1.5;
+            border: 2px solid rgba(0, 56, 168, 0.4);
+        }
+
+        .log-entry {
+            font-weight: 500;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Target Intel Badge */
+        .intel-badge {
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--ph-blue);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Realistic Rocket Animation */
+        .rocket-container {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10001;
+            pointer-events: none;
+            display: none;
+        }
+
+        .rocket-body {
+            width: 40px;
+            height: 80px;
+            background: #e2e8f0;
+            border-radius: 50% 50% 10% 10%;
+            position: relative;
+            box-shadow: inset -5px 0 10px rgba(0,0,0,0.2);
+        }
+
+        .rocket-body::before { /* Nose cone */
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: 0;
+            width: 40px;
+            height: 30px;
+            background: var(--ph-red);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        .rocket-fin-l, .rocket-fin-r {
+            position: absolute;
+            bottom: 0;
+            width: 20px;
+            height: 30px;
+            background: var(--ph-blue);
+        }
+        .rocket-fin-l { left: -15px; clip-path: polygon(100% 0, 0 100%, 100% 100%); }
+        .rocket-fin-r { right: -15px; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+
+        .rocket-flame {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(to bottom, #f59e0b, #ef4444, transparent);
+            border-radius: 0 0 50% 50%;
+            animation: flicker 0.1s infinite;
+        }
+
+        @keyframes flicker {
+            0%, 100% { height: 40px; opacity: 1; }
+            50% { height: 35px; opacity: 0.8; }
+        }
+
+        @keyframes launch-realistic {
+            0% { bottom: -100px; transform: translateX(-50%) scale(1); }
+            20% { bottom: 20px; transform: translateX(-50%) scale(1.1); }
+            100% { bottom: 80%; transform: translateX(-50%) scale(0.5); opacity: 0; }
         }
 
         #log-container::-webkit-scrollbar { width: 6px; }
@@ -253,6 +307,15 @@
     <div class="ph-accent-line"></div>
     <canvas id="explosion-canvas"></canvas>
 
+    <!-- Realistic Rocket -->
+    <div class="rocket-container" id="rocket">
+        <div class="rocket-body">
+            <div class="rocket-fin-l"></div>
+            <div class="rocket-fin-r"></div>
+            <div class="rocket-flame"></div>
+        </div>
+    </div>
+
     <nav class="navbar navbar-expand-lg mb-5">
         <div class="container">
             <a class="navbar-brand fw-bold text-white d-flex align-items-center" href="#">
@@ -271,13 +334,25 @@
             <div class="col-lg-7">
                 <div class="card p-4 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="m-0"><i class="bi bi-rocket-takeoff-fill me-2 text-warning rocket-anim"></i>COMMAND CENTER</h5>
-                        <span class="text-secondary small">V1.3.0 POWERED</span>
+                        <h5 class="m-0 text-white"><i class="bi bi-rocket-takeoff-fill me-2 text-warning"></i>COMMAND CENTER</h5>
+                        <span class="badge bg-primary">PRESTIGE V1.4.0</span>
                     </div>
                     <form id="attackForm">
                         <div class="mb-4 textarea-container">
-                            <label class="form-label text-secondary small fw-bold uppercase">TARGET PHONE NUMBERS</label>
-                            <textarea id="phone" class="form-control" rows="4" placeholder="09123456789, 09987654321" required></textarea>
+                            <label class="form-label text-secondary small fw-bold uppercase">TARGET ACQUISITION</label>
+                            <textarea id="phone" class="form-control" rows="3" placeholder="09123456789, 09987654321" required></textarea>
+                            
+                            <!-- Intel Badge -->
+                            <div id="intel-badge" class="intel-badge">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="small">
+                                        <i class="bi bi-cpu me-2 text-info"></i>CARRIER: <span id="intel-carrier" class="text-white fw-bold">...</span>
+                                    </div>
+                                    <div class="small">
+                                        <i class="bi bi-shield-lock me-2 text-warning"></i>STATUS: <span id="intel-status" class="text-white fw-bold">...</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="row mb-4">
@@ -362,6 +437,9 @@
         const failedStat = document.getElementById('stat-failed');
         const canvas = document.getElementById('explosion-canvas');
         const ctx = canvas.getContext('2d');
+        const rocket = document.getElementById('rocket');
+        const intelBadge = document.getElementById('intel-badge');
+        const phoneInput = document.getElementById('phone');
 
         let isAttacking = false;
 
@@ -379,17 +457,17 @@
                 this.x = x;
                 this.y = y;
                 this.color = color;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = (Math.random() - 0.5) * 15;
-                this.speedY = (Math.random() - 0.5) * 15;
-                this.gravity = 0.1;
+                this.size = Math.random() * 8 + 3;
+                this.speedX = (Math.random() - 0.5) * 20;
+                this.speedY = (Math.random() - 0.5) * 20;
+                this.gravity = 0.15;
                 this.opacity = 1;
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
                 this.speedY += this.gravity;
-                this.opacity -= 0.02;
+                this.opacity -= 0.015;
             }
             draw() {
                 ctx.globalAlpha = this.opacity;
@@ -400,9 +478,9 @@
             }
         }
 
-        function createExplosion(x, y) {
-            const colors = ['#0038A8', '#CE1126', '#FCD116', '#FFFFFF'];
-            for (let i = 0; i < 50; i++) {
+        function createExplosion(x, y, power = 50) {
+            const colors = ['#0038A8', '#CE1126', '#FCD116', '#FFFFFF', '#f97316'];
+            for (let i = 0; i < power; i++) {
                 particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
             }
         }
@@ -421,18 +499,39 @@
         }
         animateParticles();
 
+        // Phone Lookup Intelligence
+        let lookupTimer;
+        phoneInput.addEventListener('input', () => {
+            clearTimeout(lookupTimer);
+            const val = phoneInput.value.trim().split(/[,\n\s]+/)[0];
+            if (val.length >= 4) {
+                lookupTimer = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`/lookup/${val}`);
+                        const data = await res.json();
+                        if (!data.error) {
+                            document.getElementById('intel-carrier').innerText = data.carrier;
+                            document.getElementById('intel-status').innerText = data.status;
+                            document.getElementById('intel-status').className = data.limited ? 'text-danger fw-bold' : 'text-success fw-bold';
+                            intelBadge.style.display = 'block';
+                        }
+                    } catch (e) { console.error(e); }
+                }, 500);
+            } else {
+                intelBadge.style.display = 'none';
+            }
+        });
+
         function addLog(msg, type = 'info') {
             const entry = document.createElement('div');
             entry.className = `log-entry log-${type}`;
             const time = new Date().toLocaleTimeString();
-            entry.innerHTML = `<span class="text-secondary opacity-50">[${time}]</span> ${msg}`;
+            entry.innerHTML = `<span class="text-secondary small">[${time}]</span> ${msg}`;
             logContainer.prepend(entry);
             
-            // Trigger explosion on success
             if (type === 'success' || msg.includes('OK')) {
-                // Approximate position of success card
                 const rect = successStat.getBoundingClientRect();
-                createExplosion(rect.left + rect.width/2, rect.top + rect.height/2);
+                createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, 30);
             }
         }
 
@@ -440,19 +539,31 @@
             e.preventDefault();
             if (isAttacking) return;
 
-            const phone = document.getElementById('phone').value;
+            const phone = phoneInput.value;
             const amount = document.getElementById('amount').value;
             const selectedOptions = Array.from(document.getElementById('services').selectedOptions).map(o => o.value);
             const services = selectedOptions.includes('all') ? null : selectedOptions;
 
             isAttacking = true;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner-grow spinner-grow-sm me-2"></span>DEPLOYING PAYLOAD...';
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>CALIBRATING ROCKETS...';
             
             successStat.innerText = '0';
             failedStat.innerText = '0';
             logContainer.innerHTML = '';
-            addLog(`Initializing mission for targets...`, 'info');
+            
+            // Rocket Launch Sequence
+            rocket.style.display = 'block';
+            rocket.style.animation = 'launch-realistic 1.5s forwards ease-in';
+            
+            setTimeout(() => {
+                const rect = rocket.getBoundingClientRect();
+                createExplosion(window.innerWidth/2, window.innerHeight * 0.2, 150);
+                rocket.style.display = 'none';
+                rocket.style.animation = '';
+            }, 1400);
+
+            addLog(`Initializing payload deployment for ${phone.split(/[,\n]+/).length} targets...`, 'info');
 
             try {
                 const response = await fetch('/attack', {
@@ -466,22 +577,24 @@
                 } else {
                     const data = await response.json();
                     if (data.success) {
-                        addLog('Payload deployed successfully. Monitoring hits...', 'success');
+                        addLog('Mission control: ROCKETS AWAY. Tracking impact...', 'success');
                         pollStatus();
                     } else {
-                        addLog('Deployment failed: ' + data.error, 'error');
-                        isAttacking = false;
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>INITIALIZE DEPLOYMENT';
+                        addLog('Launch aborted: ' + data.error, 'error');
+                        resetButton();
                     }
                 }
             } catch (err) {
-                addLog('Fatal system error: ' + err.message, 'error');
-                isAttacking = false;
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>INITIALIZE DEPLOYMENT';
+                addLog('Telemetry failure: ' + err.message, 'error');
+                resetButton();
             }
         };
+
+        function resetButton() {
+            isAttacking = false;
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>INITIALIZE DEPLOYMENT';
+        }
 
         async function pollStatus() {
             const interval = setInterval(async () => {
@@ -491,7 +604,7 @@
                     
                     if (parseInt(data.success) > parseInt(successStat.innerText)) {
                         const rect = successStat.getBoundingClientRect();
-                        createExplosion(rect.left + rect.width/2, rect.top + rect.height/2);
+                        createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, 40);
                     }
                     
                     successStat.innerText = data.success;
@@ -503,17 +616,13 @@
 
                     if (!data.active) {
                         clearInterval(interval);
-                        isAttacking = false;
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = '<i class="bi bi-lightning-charge-fill me-2"></i>INITIALIZE DEPLOYMENT';
-                        addLog('Mission completed. Standing down.', 'info');
-                        
-                        // Big explosion on finish
+                        resetButton();
+                        addLog('Mission objectives finalized. Standing down.', 'info');
                         const rect = successStat.getBoundingClientRect();
-                        for(let i=0; i<3; i++) setTimeout(() => createExplosion(rect.left + rect.width/2, rect.top + rect.height/2), i*200);
+                        for(let i=0; i<3; i++) setTimeout(() => createExplosion(rect.left + rect.width/2, rect.top + rect.height/2, 60), i*300);
                     }
                 } catch (err) {
-                    console.error('Telemetry lost:', err);
+                    console.error('Lost signal:', err);
                 }
             }, 1500);
         }

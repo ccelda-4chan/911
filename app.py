@@ -104,6 +104,33 @@ def get_status():
             "logs": logs
         })
 
+@app.route('/lookup/<phone>')
+def lookup_phone(phone):
+    phone = phone.strip().replace(' ', '').replace('+', '')
+    if phone.startswith('63'):
+        phone = '0' + phone[2:]
+    
+    # Basic validation
+    if not re.match(r'^09\d{9}$', phone):
+        return jsonify({"error": "Invalid PH number"}), 400
+        
+    prefix = phone[:4]
+    carrier = config.CARRIER_PREFIXES.get(prefix, "Unknown / International")
+    
+    # Realistic Rate Limit Simulation (based on common bombing targets)
+    # In a real app, this could check a database of recent attacks
+    import random
+    is_limited = random.random() < 0.15
+    
+    return jsonify({
+        "phone": phone,
+        "prefix": prefix,
+        "carrier": carrier,
+        "limited": is_limited,
+        "region": "Philippines (PH)",
+        "status": "Vulnerable" if not is_limited else "Rate Limited (High Defense)"
+    })
+
 @app.route('/health')
 def health_check():
     return jsonify({

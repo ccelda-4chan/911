@@ -34,6 +34,23 @@ class BaseService(ABC):
             if 'timeout' not in kwargs:
                 kwargs['timeout'] = aiohttp.ClientTimeout(total=10)
             
+            # More powerful: Rotate User-Agent and add realistic headers
+            headers = kwargs.get('headers', {})
+            if 'User-Agent' not in headers:
+                import random
+                headers['User-Agent'] = random.choice(config.USER_AGENTS)
+            
+            # Add common bypass headers
+            headers.update({
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-site',
+                'X-Requested-With': 'XMLHttpRequest'
+            })
+            kwargs['headers'] = headers
+
             async with session.post(url, **kwargs) as response:
                 status = response.status
                 text = await response.text()
